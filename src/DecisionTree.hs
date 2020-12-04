@@ -7,10 +7,11 @@ import Data.Map ( fromListWith, toList )
 import Data.List ( minimumBy, transpose, nub )
 import Data.Tuple
 import Data.Ord
+import Data.Either
 
 
 type Depth = Int
-type FeatureIdentifier = Int --  | String
+type FeatureIdentifier = Int
 type Decision a = (FeatureIdentifier, a)
 
 
@@ -122,13 +123,23 @@ allfeatures ex = transpose [pure (,) <*> (features x) <*> [classe x] | x <- ex]
 --  Recebe uma lista contendo pares de valor da feature com valor da classe para cada exemplo
 --  Separa essa lista em duas para um determinado valor da feature
 separateTrueFalse :: [FeatureWithClass] -> Feature -> ([FeatureWithClass], [FeatureWithClass])
-separateTrueFalse x f= ( filter (\(a,_) -> f == a) x ,    -- possible True answer
-                        filter (\(a,_) -> f /= a) x )    -- all other classes
+separateTrueFalse x f =
+    if isLeft f then
+        ( filter ((== f) . fst) x ,    -- possible True answer
+          filter ((/= f) . fst) x )    -- all other classes
+    else
+        ( filter ((<= f) . fst) x ,    -- possible True answer
+          filter (( > f) . fst) x )    -- all other classes
+
 
 
 -- Função que recebe a decisão salva em um nó e compara com o valor da feature em um dado exemplo
 compareWithDecision :: Decision Feature -> Example -> Bool
-compareWithDecision d e = features e !! fst d == snd d
+compareWithDecision d e =
+    if isLeft value then
+        features e !! fst d == snd d
+    else features e !! fst d <= snd d
+    where value = snd d
 
 
 -- Calcula o indice gini para qualquer ponto da árvore fornecido
