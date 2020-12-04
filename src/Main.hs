@@ -17,10 +17,10 @@ instance Show RandomForest where
 
 
 paramsTree :: DTreeParameters
-paramsTree = DTreeParameters 500 100 4  -- minSampleSplit, minSampleLeaf, maxDepth
+paramsTree = DTreeParameters 200 100 5  -- minSampleSplit, minSampleLeaf, maxDepth
 
 paramsForest :: RFParameters
-paramsForest = RFParameters 1000 2000 6 paramsTree -- nEstimators, nSamples, nFeatures
+paramsForest = RFParameters 100 4000 5 paramsTree -- nEstimators, nSamples, nFeatures
 
 
 
