@@ -26,11 +26,13 @@ executable random-forest
   Other-Modules:       ReadData
                      , DecisionTree
                      , Aleatorio
+                     , RandomForest
 library
   exposed-modules:
       ReadData
     , DecisionTree
     , Aleatorio
+    , RandomForest
   hs-source-dirs:
       src
   build-depends:
