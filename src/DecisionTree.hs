@@ -89,8 +89,8 @@ bestFeature examples parameters = if bestGini <= 1 then Just (pos, bestFeat) els
 -- Dado uma determinada coluna de feature, determina o valor que melhor separa as classes e o gini da árvore gerada
 bestQuestion :: [FeatureWithClass] -> DTreeParameters -> (Double, Feature) -- Double=Gini
 bestQuestion fc parameters=
-    let separated = separateTrueFalse fc <$> possibleValues
-        ginis = calcGini <$> separated
+    let separatedExamples = separateTrueFalse fc <$> possibleValues
+        ginis = calcGini <$> separatedExamples
     in
         minimum $ zip ginis possibleValues
     where
@@ -109,7 +109,7 @@ bestQuestion fc parameters=
 possibleNode :: ([FeatureWithClass], [FeatureWithClass]) -> DTree
 possibleNode (t,f) = Node (allExamples) 2 undefined [Leaf trueExamples undefined , Leaf falseExamples undefined]
     where
-        trueExamples = fmap (\(f,l) -> Example [f] l) t
+        trueExamples  = fmap (\(f,l) -> Example [f] l) t
         falseExamples = fmap (\(f,l) -> Example [f] l) f
         allExamples = trueExamples ++ falseExamples
 
@@ -147,14 +147,13 @@ giniTree :: DTree -> Double
 giniTree (Leaf examples _) = sum $ zipWith (*) probs $ fmap (1-) probs  -- Gini definition for leaf
     where
         frequencies = frequency $ fmap classe $ examples
-        probs = fmap (\(f, _) -> f/len) frequencies
+        probs = fmap ((/len) . fst) frequencies
         len = fromIntegral $ length examples
-giniTree (Node examples _ _ a) =  sum $ zipWith (*) (fmap (/len) nE)  ginis -- Gini definition for node
+giniTree (Node examples _ _ sons) =  sum $ zipWith (*) (fmap (/len) nExamplesSons)  ginisSons -- Gini definition for node
     where
-        nE = fmap nExamples a
-        ginis = fmap giniTree a
+        ginisSons = fmap giniTree sons
+        nExamplesSons = fmap (fromIntegral . length . treeExamples) sons
         len = fromIntegral $ length examples
-        nExamples t = fromIntegral $ length $ treeExamples t
 
 
 -- Recebe uma lista com a classe de cada exemplo calcula a frequencia de cada uma
