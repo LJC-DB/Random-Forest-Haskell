@@ -12,10 +12,10 @@ import System.Random.Shuffle
 -- Seleciona os exemplos a serem utilizados para cada árvore
 -- Realiza a amostragem de exemplos e de features utilizando de funções auxiliares
 sampleExamples ::  RandomGen gen => gen -> [Example] -> Int -> Int -> ([FeatureIdentifier], [Example])
-sampleExamples g examples nFeatures nExamples = sampledFeatures
+sampleExamples g examples nFeatures nExamples = sampledExamples
     where
         sampledLines = sampleLines gLines nExamples examples
-        sampledFeatures = sampleFeatures gFeatures nFeatures sampledLines
+        sampledExamples = sampleFeatures gFeatures nFeatures sampledLines
         (gFeatures, gLines) = split g
 
 
@@ -48,5 +48,4 @@ selectFeatures examples identifiers = transpose $ takeLines transposedFeatures i
 
 -- Dado uma lista qualquer, pega os elementos nas posições fornecidas.
 takeLines :: [a] -> [Int] -> [a]
-takeLines _ [] = []
-takeLines xs (n:ns) = [xs !! n] ++ takeLines xs ns
+takeLines xs ns = [xs !! n | n <- ns]

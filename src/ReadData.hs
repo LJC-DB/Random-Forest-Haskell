@@ -14,9 +14,11 @@ createExample linha =
     Example (readNum <$> init columns) (last columns)
     where
         columns = splitOn "," linha
+
+        readNum :: String -> Feature
         readNum f = let value = readMaybe f :: Maybe Double in
             case value of
-                Nothing -> Left f
+                Nothing -> Left f   -- Caso não consiga tornar numérico, o valor corresponde a própria String como tipo categórico
                 Just n  -> Right n
 
 loadExamples :: Header -> FilePath -> IO [Example]

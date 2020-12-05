@@ -17,6 +17,7 @@ instance Show RandomForest where
 
 
 trainRandomForest :: RandomGen gen => [Example] -> RFParameters -> gen -> Maybe RandomForest
+trainRandomForest [] _ _ = Nothing
 trainRandomForest examples parameters g =
     case maybetrees of
         Nothing -> Nothing
@@ -39,14 +40,14 @@ generateNTrees n g examples parameters =
 
 
 predictRandomForest :: RandomForest -> [Example] -> [ResultClass]
+predictRandomForest _ [] = []
 predictRandomForest rf examples = majorityVote $ zipWith predictDecisionTree trees treesExamples
     where
         trees = snd <$> estimators rf
         identifiers = fst <$> estimators rf
         selectedFeatures = (selectFeatures examples) <$> identifiers  -- Filtra as features selecionadas para cada árvore durante treino
-        selectExamples [] _ = []
-        selectExamples (f:fs) c = zipWith Example f c : selectExamples fs c  -- Associa as features de cada árvore com as classes (que são comuns a todas)
-        treesExamples = selectExamples selectedFeatures (classe <$> examples)
+         -- Associa as features de cada árvore com as classes (que são comuns a todas)
+        treesExamples = [zipWith Example f (classe <$> examples) | f <- selectedFeatures]
 
 
 
